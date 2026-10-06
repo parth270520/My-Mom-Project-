@@ -1,0 +1,457 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Family Details</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/family_detail.css' %}"
+    >
+
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo-area">
+
+            <div class="logo">
+                A
+            </div>
+
+            <div class="logo-text">
+                <h2>ASHA Care</h2>
+                <p>Healthcare Portal</p>
+            </div>
+
+        </div>
+
+
+        <nav class="nav">
+
+            <a href="{% url 'dashboard' %}">
+                <span class="nav-icon">▣</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{% url 'add_family' %}">
+                <span class="nav-icon">＋</span>
+                <span>Add Family</span>
+            </a>
+
+            <a href="{% url 'family_list' %}" class="active">
+                <span class="nav-icon">⌂</span>
+                <span>Family List</span>
+            </a>
+
+            <a href="{% url 'add_member' %}">
+                <span class="nav-icon">＋</span>
+                <span>Add Member</span>
+            </a>
+
+            <a href="{% url 'member_list' %}">
+                <span class="nav-icon">♙</span>
+                <span>Member List</span>
+            </a>
+
+        </nav>
+
+
+        <div class="logout">
+
+            <a href="{% url 'logout' %}">
+                <span class="nav-icon">↪</span>
+                <span>Logout</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+
+        <!-- HEADER -->
+
+        <header class="top-header">
+
+            <a
+                href="{% url 'family_list' %}"
+                class="back-link">
+                ← Back to Families
+            </a>
+
+            <div class="header-row">
+
+                <div class="header-title">
+
+                    <h1>Family Details</h1>
+
+                    <p>
+                        View household and family member information.
+                    </p>
+
+                </div>
+
+                <a
+                    href="{% url 'add_member' %}"
+                    class="btn-primary">
+                    + Add Member
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <div class="content">
+
+
+            <!-- HOUSEHOLD INFORMATION -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h2>Household Information</h2>
+
+                    <p>
+                        Basic family and household details
+                    </p>
+
+                </div>
+
+
+                <div class="info-grid">
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Family Name
+                        </span>
+
+                        <span class="info-value">
+                            {{ family.family_name }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Village / Gone
+                        </span>
+
+                        <span class="info-value">
+                            {{ family.village }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            House Number
+                        </span>
+
+                        <span class="info-value">
+                            {{ family.house_number }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Family Number
+                        </span>
+
+                        <span class="info-value">
+                            {{ family.family_number }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Contact Number
+                        </span>
+
+                        <span class="info-value">
+                            {{ family.contact_number|default:"—" }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Area
+                        </span>
+
+                        <span class="info-value">
+                            {{ family.area|default:"—" }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            PIN Code
+                        </span>
+
+                        <span class="info-value">
+                            {{ family.pin_code|default:"—" }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Address
+                        </span>
+
+                        <span class="info-value">
+                            {{ family.address|default:"—" }}
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- FAMILY MEMBERS -->
+
+            <div class="card">
+
+
+                <div class="members-header">
+
+                    <div>
+
+                        <h2>Family Members</h2>
+
+                        <p>
+                            Total Members:
+                            <strong>{{ members|length }}</strong>
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="{% url 'add_member' %}"
+                        class="btn-secondary">
+                        + Add Member
+                    </a>
+
+                </div>
+
+
+                {% if members %}
+
+
+                <div class="table-wrapper">
+
+                    <table class="members-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Member Name
+                                </th>
+
+                                <th>
+                                    Gender
+                                </th>
+
+                                <th>
+                                    Relation
+                                </th>
+
+                                <th>
+                                    Date of Birth
+                                </th>
+
+                                <th>
+                                    Age
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for member in members %}
+
+                            <tr>
+
+
+                                <td>
+
+                                    <span class="member-name">
+                                        {{ member.name }}
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+                                    {{ member.gender }}
+                                </td>
+
+
+                                <td>
+                                    {{ member.relation }}
+                                </td>
+
+
+                                <td>
+                                    {{ member.date_of_birth|date:"d-m-Y" }}
+                                </td>
+
+
+                                <td>
+
+                                    <span
+                                        class="member-age"
+                                        data-dob="{{ member.date_of_birth|date:'Y-m-d' }}">
+                                        —
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    {% if member.alive_status == "Alive" %}
+
+                                        <span class="badge badge-alive">
+                                            Alive
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge badge-dead">
+                                            Dead
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    <a
+                                        href="{% url 'member_detail' member.id %}"
+                                        class="view-btn">
+                                        View →
+                                    </a>
+
+                                </td>
+
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                {% else %}
+
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        👤
+                    </div>
+
+                    <h3>
+                        No Members Added
+                    </h3>
+
+                    <p>
+                        No members have been added to this family yet.
+                    </p>
+
+                    <a
+                        href="{% url 'add_member' %}"
+                        class="btn-primary">
+                        + Add First Member
+                    </a>
+
+                </div>
+
+
+                {% endif %}
+
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+
+
+<script src="{% static 'js/family_detail.js' %}"></script>
+
+<script src="{% static 'js/theme.js' %}"></script>
+
+</body>
+
+</html>

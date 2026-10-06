@@ -1,0 +1,431 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Member List - ASHA Care</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/member_list.css' %}"
+    >
+
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="small-logo">
+                A
+            </div>
+
+            <div>
+
+                <h2>
+                    ASHA Care
+                </h2>
+
+                <span>
+                    Healthcare Portal
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="nav-item"
+            >
+                <span>▣</span>
+                Dashboard
+            </a>
+            <a
+                href="{% url 'add_village' %}"
+                class="nav-item"
+            >
+                <span>⌂</span>
+                Add Village
+            </a>
+
+
+            <a
+                href="{% url 'add_family' %}"
+                class="nav-item"
+            >
+                <span>+</span>
+                Add Family
+            </a>
+
+
+            <a
+                href="{% url 'family_list' %}"
+                class="nav-item"
+            >
+                <span>⌂</span>
+                Family List
+            </a>
+
+
+            <a
+                href="{% url 'add_member' %}"
+                class="nav-item"
+            >
+                <span>+</span>
+                Add Member
+            </a>
+
+
+            <a
+                href="{% url 'member_list' %}"
+                class="nav-item active"
+            >
+                <span>♙</span>
+                Member List
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a
+                href="{% url 'logout' %}"
+                class="nav-item logout"
+            >
+                <span>↪</span>
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Member List
+                </h1>
+
+                <p>
+                    Members organized by house.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'add_member' %}"
+                class="primary-btn"
+            >
+                + Add Member
+            </a>
+
+        </header>
+
+
+        <section class="list-section">
+
+
+            <!-- SEARCH -->
+
+            <div class="search-card">
+
+                <form
+                    method="GET"
+                    action="{% url 'member_list' %}"
+                    class="search-form"
+                >
+
+                    <div class="search-input">
+
+                        <span>
+                            ⌕
+                        </span>
+
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search }}"
+                            placeholder="Search house number, family name or member name..."
+                        >
+
+                    </div>
+
+
+                    <button
+                        class="primary-btn"
+                        type="submit"
+                    >
+                        Search
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- HOUSES -->
+
+            <div class="table-card">
+
+                <div class="table-header">
+
+                    <div>
+
+                        <h2>
+                            Members by House
+                        </h2>
+
+                        <p>
+                            All family members are grouped under their house number.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {% for item in families %}
+
+                    <div class="house-block">
+
+
+                        <!-- HOUSE HEADER -->
+
+                        <div class="house-header">
+
+                            <div class="house-title">
+
+                                <div>
+
+                                    <div class="house-id">
+
+                                        House
+                                        {{ item.family.house_number|stringformat:"04d" }}
+
+                                    </div>
+
+
+                                    <div class="house-info">
+
+                                        {{ item.family.family_name }}
+
+                                        {% if item.family.village %}
+
+                                            · {{ item.family.village.name }}
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="member-count">
+
+                                {{ item.members|length }}
+
+                                Member{{ item.members|length|pluralize }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- COLUMN HEADER -->
+
+                        <div class="member-table-header">
+
+                            <div>
+                                ID
+                            </div>
+
+                            <div>
+                                Name
+                            </div>
+
+                            <div>
+                                DOB
+                            </div>
+
+                            <div>
+                                Gender
+                            </div>
+
+                            <div>
+                                Relation
+                            </div>
+
+                            <div>
+                                Family
+                            </div>
+
+                            <div>
+                                Status
+                            </div>
+
+                            <div>
+                                Action
+                            </div>
+
+                        </div>
+
+
+                        <!-- MEMBERS -->
+
+                        <div class="member-hierarchy">
+
+                            {% for member in item.members %}
+
+                                <div class="member-row">
+
+
+                                    <div class="member-id">
+
+                                        M{{ member.id|stringformat:"03d" }}
+
+                                    </div>
+
+
+                                    <div class="member-name">
+
+                                        {{ member.name }}
+
+                                    </div>
+
+
+                                    <div class="member-detail">
+
+                                        {% if member.date_of_birth %}
+
+                                            {{ member.date_of_birth|date:"d-m-Y" }}
+
+                                        {% else %}
+
+                                            -
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <div class="member-detail">
+
+                                        {{ member.gender }}
+
+                                    </div>
+
+
+                                    <div class="member-detail">
+
+                                        {{ member.relation }}
+
+                                    </div>
+
+
+                                    <div class="member-detail">
+
+                                        {{ item.family.family_name }}
+
+                                    </div>
+
+
+                                    <div class="status">
+
+                                        {{ member.alive_status }}
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <a
+                                            href="{% url 'member_detail' member.id %}"
+                                            class="view-btn"
+                                        >
+                                            View
+                                        </a>
+
+                                    </div>
+
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                {% empty %}
+
+
+                    <div
+                        style="
+                            padding: 40px;
+                            text-align: center;
+                        "
+                    >
+
+                        No members found.
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="{% static 'js/member_list.js' %}"></script>
+
+<script src="{% static 'js/theme.js' %}"></script>
+
+</body>
+</html>

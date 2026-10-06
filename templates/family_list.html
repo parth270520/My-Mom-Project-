@@ -1,0 +1,520 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Family List - ASHA Care
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/family_list.css' %}"
+    >
+
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="small-logo">
+                A
+            </div>
+
+            <div>
+
+                <h2>
+                    ASHA Care
+                </h2>
+
+                <span>
+                    Healthcare Portal
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="nav-item"
+            >
+                <span>▣</span>
+                Dashboard
+            </a>
+            <a
+                href="{% url 'add_village' %}"
+                class="nav-item"
+            >
+                <span>⌂</span>
+                Add Village
+            </a>
+
+
+            <a
+                href="{% url 'add_family' %}"
+                class="nav-item"
+            >
+                <span>+</span>
+                Add Family
+            </a>
+
+
+            <a
+                href="{% url 'family_list' %}"
+                class="nav-item active"
+            >
+                <span>⌂</span>
+                Family List
+            </a>
+
+
+            <a
+                href="{% url 'add_member' %}"
+                class="nav-item"
+            >
+                <span>+</span>
+                Add Member
+            </a>
+
+
+            <a
+                href="{% url 'member_list' %}"
+                class="nav-item"
+            >
+                <span>♙</span>
+                Member List
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a
+                href="{% url 'logout' %}"
+                class="nav-item logout"
+            >
+                <span>↪</span>
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Family List
+                </h1>
+
+                <p>
+                    Families organized by village.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'add_family' %}"
+                class="primary-btn"
+            >
+                + Add Family
+            </a>
+
+        </header>
+
+
+
+        <section class="list-section">
+
+
+            <!-- SEARCH -->
+
+            <div class="search-card">
+
+                <form
+                    method="GET"
+                    action="{% url 'family_list' %}"
+                    class="search-form"
+                >
+
+                    <div class="search-input">
+
+                        <span>
+                            ⌕
+                        </span>
+
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search }}"
+                            placeholder="Search family name or village name..."
+                        >
+
+                    </div>
+
+
+                    {% if selected_village_id %}
+
+                        <input
+                            type="hidden"
+                            name="village"
+                            value="{{ selected_village_id }}"
+                        >
+
+                    {% endif %}
+
+
+                    <button
+                        class="primary-btn"
+                        type="submit"
+                    >
+                        Search
+                    </button>
+
+                </form>
+
+            </div>
+
+
+
+            <!-- VILLAGES -->
+
+            <div class="table-card">
+
+
+                <div class="table-header">
+
+                    <div>
+
+                        <h2>
+                            Families by Village
+                        </h2>
+
+                        <p>
+                            All registered families are grouped under their village.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                {% for group in villages_with_families %}
+
+
+                    <!-- VILLAGE HEADER -->
+
+                    <div
+                        style="
+                            padding:18px 22px;
+                            background:#f8fafc;
+                            border-top:1px solid #e5e7eb;
+                            border-bottom:1px solid #e5e7eb;
+                            display:flex;
+                            align-items:center;
+                            justify-content:space-between;
+                        "
+                    >
+
+
+                        <div>
+
+                            <h2
+                                style="
+                                    margin:0 0 4px 0;
+                                    font-size:20px;
+                                "
+                            >
+
+                                Village
+                                {{ group.village.village_number|stringformat:"04d" }}
+
+                            </h2>
+
+
+                            <p
+                                style="
+                                    margin:0;
+                                    color:#64748b;
+                                "
+                            >
+
+                                {{ group.village.name }}
+
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            style="
+                                background:#eef2ff;
+                                padding:7px 14px;
+                                border-radius:20px;
+                                font-size:13px;
+                                font-weight:600;
+                            "
+                        >
+
+                            {{ group.families|length }}
+
+                            {% if group.families|length == 1 %}
+                                Family
+                            {% else %}
+                                Families
+                            {% endif %}
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- FAMILY TABLE -->
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        House Number
+                                    </th>
+
+                                    <th>
+                                        Family Name
+                                    </th>
+
+                                    <th>
+                                        Family Number
+                                    </th>
+
+                                    <th>
+                                        Contact
+                                    </th>
+
+                                    <th>
+                                        Area
+                                    </th>
+
+                                    <th>
+                                        Members
+                                    </th>
+
+                                    <th>
+                                        Action
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+
+                            {% for family in group.families %}
+
+
+                                <tr>
+
+
+                                    <td>
+
+                                        <strong>
+
+                                            {{ family.house_number|stringformat:"04d" }}
+
+                                        </strong>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <strong>
+
+                                            {{ family.family_name }}
+
+                                        </strong>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if family.family_number %}
+
+                                            {{ family.family_number }}
+
+                                        {% else %}
+
+                                            -
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if family.contact_number %}
+
+                                            {{ family.contact_number }}
+
+                                        {% else %}
+
+                                            -
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if family.area %}
+
+                                            {{ family.area }}
+
+                                        {% else %}
+
+                                            -
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ family.members.count }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <a
+                                            href="{% url 'family_detail' family.id %}"
+                                            class="view-btn"
+                                        >
+                                            View
+                                        </a>
+
+                                    </td>
+
+
+                                </tr>
+
+
+                            {% endfor %}
+
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                {% empty %}
+
+
+                    <!-- NO RESULTS -->
+
+                    <div
+                        style="
+                            padding:45px 20px;
+                            text-align:center;
+                            color:#64748b;
+                        "
+                    >
+
+                        <h3
+                            style="
+                                margin-bottom:8px;
+                                color:#1e293b;
+                            "
+                        >
+                            No families found
+                        </h3>
+
+
+                        <p>
+                            No families match your search.
+                        </p>
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<script src="{% static 'js/family_list.js' %}"></script>
+
+<script src="{% static 'js/theme.js' %}"></script>
+
+</body>
+
+</html>

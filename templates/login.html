@@ -1,0 +1,172 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ASHA Care - Login</title>
+
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/login.css' %}"
+    >
+
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
+</head>
+
+
+<body>
+
+
+<div class="login-page">
+
+
+    <!-- LEFT PANEL -->
+
+    <div class="login-left">
+
+        <div class="logo-box">
+            <span>ASHA</span>
+        </div>
+
+
+        <h1>
+            ASHA Care
+        </h1>
+
+
+        <p class="description">
+            Family and community management platform for ASHA workers
+            and healthcare staff.
+        </p>
+
+
+        <div class="features">
+
+            <div class="feature">
+                <div class="check">✓</div>
+                <span>Manage families easily</span>
+            </div>
+
+
+            <div class="feature">
+                <div class="check">✓</div>
+                <span>Maintain member records</span>
+            </div>
+
+
+            <div class="feature">
+                <div class="check">✓</div>
+                <span>Access information securely</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- RIGHT PANEL -->
+
+    <div class="login-right">
+
+        <div class="login-card">
+
+            <h2>
+                Welcome Back
+            </h2>
+
+
+            <p class="subtitle">
+                Enter your 6-digit PIN to continue
+            </p>
+
+
+            {% if error %}
+
+                <div class="error-message">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <label class="form-label">
+                    6-Digit PIN
+                </label>
+
+
+                <input
+                    type="password"
+                    name="pin"
+                    class="pin-input"
+                    placeholder="Enter PIN"
+                    maxlength="6"
+                    minlength="6"
+                    pattern="[0-9]{6}"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    required
+                >
+
+
+                <p class="pin-hint">
+                    Enter your 6-digit security PIN
+                </p>
+
+
+                <button
+                    type="submit"
+                    class="login-button">
+                    Login
+                </button>
+
+
+            </form>
+
+
+            <!-- FORGOT PIN -->
+
+            <div class="forgot-pin">
+
+                <a href="{% url 'forgot_pin' %}">
+                    Forgot PIN?
+                </a>
+
+            </div>
+
+
+            <p class="security-text">
+                🔒 Your information is securely protected
+            </p>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<script src="{% static 'js/login.js' %}"></script>
+
+<script src="{% static 'js/theme.js' %}"></script>
+
+</body>
+</html>

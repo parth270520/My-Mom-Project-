@@ -1,0 +1,171 @@
+
+
+        .submitted-page {
+            padding: 28px 22px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--theme-accent-dark);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .submitted-badge {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 20px;
+            background: var(--theme-accent-soft);
+            color: var(--theme-accent-dark);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .submitted-members {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .submitted-member-card {
+            background: var(--theme-surface);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .submitted-member-photo {
+            width: 64px;
+            height: 64px;
+            min-width: 64px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--theme-accent-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--theme-accent-dark);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .submitted-member-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .submitted-member-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .submitted-member-name {
+            margin: 0 0 5px;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--theme-text);
+        }
+
+        .member-location {
+            margin: 3px 0;
+            font-size: 13px;
+            color: var(--theme-muted);
+        }
+
+        .submitted-status {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: var(--theme-accent-soft);
+            color: var(--theme-accent-dark);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .view-profile {
+            display: block;
+            margin-top: 8px;
+            color: var(--theme-accent-dark);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .view-profile:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            background: var(--theme-surface);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 45px 20px;
+            text-align: center;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 8px;
+            color: var(--theme-text);
+        }
+
+        .empty-state p {
+            margin: 0;
+            color: var(--theme-muted);
+        }
+
+        @media (max-width: 900px) {
+
+            .submitted-members {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .submitted-page {
+                padding: 20px 15px;
+            }
+
+            .submitted-member-card {
+                padding: 16px;
+            }
+
+        }
+
+    
+
+
+/* Aqua card surface treatment — visual styling only */
+.action-card,
+.detail-card,
+.form-card,
+.search-card,
+.stat-card,
+.table-card {
+    background-color: var(--theme-surface);
+    border-color: var(--theme-border);
+    box-shadow: 0 4px 18px rgba(143, 250, 250, 0.16);
+}
+
+.action-card:hover,
+.detail-card:hover,
+.form-card:hover,
+.search-card:hover,
+.stat-card:hover,
+.table-card:hover {
+    border-color: var(--theme-secondary);
+    box-shadow: 0 8px 28px rgba(143, 250, 250, 0.25);
+}
