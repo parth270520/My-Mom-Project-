@@ -1,95 +1,150 @@
-/* ASHA Care theme layer — visual colors only; no layout or application logic changed. */
+/* ==========================================================================
+   ASHA Care Healthcare Design System & Theme Engine
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap');
+
 :root,
 html[data-theme="light"] {
-    --theme-primary: #8FFAFA;
-    --theme-secondary: #BBFCFC;
-    --theme-bg: #F7FFFF;
-    --theme-bg-soft: #F2FEFE;
-    --theme-surface: #FFFFFF;
-    --theme-accent-soft: #E8FEFE;
-    --theme-border: #D7F6F6;
-    --theme-border-soft: #F2FCFC;
-    --theme-text: #123F45;
-    --theme-text-2: #315D61;
-    --theme-muted: #607E81;
-    --theme-accent-dark: #2F8F93;
-    --theme-accent-dark-hover: #28777B;
+    --theme-primary: #0284c7;
+    --theme-secondary: #0d9488;
+    --theme-gradient: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+    --theme-gradient-accent: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+    --theme-bg: #f8fafc;
+    --theme-bg-soft: #f1f5f9;
+    --theme-surface: #ffffff;
+    --theme-accent-soft: #e0f2fe;
+    --theme-accent-subtle: #f0fdfa;
+    --theme-border: #e2e8f0;
+    --theme-border-soft: #edf2f7;
+    --theme-text: #0f172a;
+    --theme-text-2: #334155;
+    --theme-muted: #64748b;
+    --theme-accent-dark: #0369a1;
+    --theme-accent-dark-hover: #075985;
+    --theme-card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+    --theme-card-shadow-hover: 0 12px 30px -4px rgba(2, 132, 199, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
     color-scheme: light;
 }
 
 html[data-theme="dark"] {
-    --theme-primary: #8FFAFA;
-    --theme-secondary: #BBFCFC;
-    --theme-bg: #071D20;
-    --theme-bg-soft: #0B292D;
-    --theme-surface: #103438;
-    --theme-accent-soft: #17494D;
-    --theme-border: #286166;
-    --theme-border-soft: #1B494D;
-    --theme-text: #E9FFFF;
-    --theme-text-2: #D4FAFA;
-    --theme-muted: #9EC9CB;
-    --theme-accent-dark: #8FFAFA;
-    --theme-accent-dark-hover: #BBFCFC;
+    --theme-primary: #38bdf8;
+    --theme-secondary: #2dd4bf;
+    --theme-gradient: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+    --theme-gradient-accent: linear-gradient(135deg, #38bdf8 0%, #2dd4bf 100%);
+    --theme-bg: #090e17;
+    --theme-bg-soft: #0f172a;
+    --theme-surface: #131d31;
+    --theme-accent-soft: #172554;
+    --theme-accent-subtle: #0d2836;
+    --theme-border: #24344d;
+    --theme-border-soft: #1c293d;
+    --theme-text: #f8fafc;
+    --theme-text-2: #cbd5e1;
+    --theme-muted: #94a3b8;
+    --theme-accent-dark: #38bdf8;
+    --theme-accent-dark-hover: #7dd3fc;
+    --theme-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+    --theme-card-shadow-hover: 0 12px 30px -4px rgba(56, 189, 248, 0.2);
     color-scheme: dark;
 }
 
-/* Theme chooser only. Kept isolated so existing page layout is untouched. */
+html[data-theme="neon"] {
+    --theme-primary: #00f2fe;
+    --theme-secondary: #4facfe;
+    --theme-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+    --theme-gradient-accent: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+    --theme-bg: #030a14;
+    --theme-bg-soft: #061526;
+    --theme-surface: #0a1f36;
+    --theme-accent-soft: #0e3054;
+    --theme-accent-subtle: #092540;
+    --theme-border: #00f2fe;
+    --theme-border-soft: #133a61;
+    --theme-text: #f0fdfa;
+    --theme-text-2: #99f6e4;
+    --theme-muted: #5eead4;
+    --theme-accent-dark: #00f2fe;
+    --theme-accent-dark-hover: #67e8f9;
+    --theme-card-shadow: 0 0 25px rgba(0, 242, 254, 0.15);
+    --theme-card-shadow-hover: 0 0 35px rgba(0, 242, 254, 0.35);
+    color-scheme: dark;
+}
+
+/* Global Font Definition */
+body, button, input, textarea, select {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+h1, h2, h3, .sidebar-logo h2, .logo-box {
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif !important;
+}
+
+/* Polished Theme Chooser Widget */
 .asha-theme-picker {
     position: fixed;
-    top: 16px;
-    right: 18px;
+    bottom: 20px;
+    right: 20px;
     z-index: 9999;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 7px 9px;
+    gap: 10px;
+    padding: 8px 14px;
     border: 1px solid var(--theme-border);
-    border-radius: 10px;
+    border-radius: 9999px;
     background: var(--theme-surface);
-    box-shadow: 0 6px 20px rgba(18, 63, 69, 0.10);
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
 }
+
+.asha-theme-picker:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px rgba(2, 132, 199, 0.25);
+}
+
 .asha-theme-picker label {
     color: var(--theme-muted);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
+
+.asha-theme-picker label::before {
+    content: "🎨";
+    font-size: 14px;
+}
+
 .asha-theme-picker select {
-    min-width: 78px;
-    padding: 6px 26px 6px 9px;
+    min-width: 85px;
+    padding: 6px 12px;
     border: 1px solid var(--theme-border);
-    border-radius: 7px;
+    border-radius: 9999px;
     outline: none;
     background: var(--theme-bg-soft);
     color: var(--theme-text);
-    font: inherit;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-}
-.asha-theme-picker select:focus { border-color: var(--theme-primary); }
-
-/* Literal white backgrounds/text in the original CSS are intentionally preserved.
-   These targeted rules make dark mode complete without changing component structure. */
-html[data-theme="dark"] body { background: var(--theme-bg) !important; color: var(--theme-text); }
-html[data-theme="dark"] input,
-html[data-theme="dark"] textarea,
-html[data-theme="dark"] select { background-color: var(--theme-bg-soft); color: var(--theme-text); }
-html[data-theme="dark"] input::placeholder,
-html[data-theme="dark"] textarea::placeholder { color: var(--theme-muted); }
-html[data-theme="dark"] option { background: var(--theme-surface); color: var(--theme-text); }
-
-@media (max-width: 600px) {
-    .asha-theme-picker { top: 10px; right: 10px; }
-    .asha-theme-picker label { display: none; }
+    transition: all 0.2s;
 }
 
-/* Keep the application chrome in the selected aqua theme. */
+.asha-theme-picker select:focus {
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+}
+
+/* Chrome Elements - Sidebar & Topbar */
 .sidebar,
 .topbar {
     background: var(--theme-surface) !important;
     border-color: var(--theme-border) !important;
     color: var(--theme-text) !important;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .sidebar-logo h2,
@@ -105,99 +160,131 @@ html[data-theme="dark"] option { background: var(--theme-surface); color: var(--
     color: var(--theme-muted) !important;
 }
 
-.nav-item:hover,
-.nav-item.active {
+.nav-item {
+    transition: all 0.2s ease;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+}
+
+.nav-item:hover {
     background: var(--theme-accent-soft) !important;
-    color: var(--theme-accent-dark) !important;
+    color: var(--theme-primary) !important;
+    transform: translateX(4px);
+}
+
+.nav-item.active {
+    background: var(--theme-gradient) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
+}
+
+.nav-item.active span {
+    color: #ffffff !important;
 }
 
 .small-logo,
 .avatar {
-    background: var(--theme-accent-soft) !important;
-    color: var(--theme-accent-dark) !important;
+    background: var(--theme-gradient) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
 }
 
-/* Theme chooser: fixed bottom-right on every page. */
-.asha-theme-picker {
-    top: auto !important;
-    right: 18px !important;
-    bottom: 18px !important;
-}
-
-@media (max-width: 600px) {
-    .asha-theme-picker {
-        top: auto !important;
-        right: 10px !important;
-        bottom: 10px !important;
-    }
-}
-
-/* Neon theme — same application structure, colors only. */
-html[data-theme="neon"] {
-    --theme-primary: #8FFAFA;
-    --theme-secondary: #BBFCFC;
-    --theme-bg: #031315;
-    --theme-bg-soft: #071F22;
-    --theme-surface: #0A292C;
-    --theme-accent-soft: #0E3B3F;
-    --theme-border: #38DDE2;
-    --theme-border-soft: #17494D;
-    --theme-text: #EFFFFF;
-    --theme-text-2: #BBFCFC;
-    --theme-muted: #8EDADD;
-    --theme-accent-dark: #8FFAFA;
-    --theme-accent-dark-hover: #BBFCFC;
-    color-scheme: dark;
-}
-
-html[data-theme="neon"] body {
-    background: var(--theme-bg) !important;
-    color: var(--theme-text);
-}
-html[data-theme="neon"] input,
-html[data-theme="neon"] textarea,
-html[data-theme="neon"] select {
-    background-color: var(--theme-bg-soft);
-    color: var(--theme-text);
-}
-html[data-theme="neon"] input::placeholder,
-html[data-theme="neon"] textarea::placeholder { color: var(--theme-muted); }
-html[data-theme="neon"] option { background: var(--theme-surface); color: var(--theme-text); }
-html[data-theme="neon"] .sidebar,
-html[data-theme="neon"] .topbar,
-html[data-theme="neon"] .asha-theme-picker {
-    box-shadow: 0 0 16px rgba(143, 250, 250, .16);
-}
-html[data-theme="neon"] .action-card,
-html[data-theme="neon"] .detail-card,
-html[data-theme="neon"] .form-card,
-html[data-theme="neon"] .search-card,
-html[data-theme="neon"] .stat-card,
-html[data-theme="neon"] .table-card,
-html[data-theme="neon"] .house-block {
-    box-shadow: 0 0 14px rgba(143, 250, 250, .13);
-}
-
-/* Keep Add Member and Search buttons consistent with the selected aqua theme. */
+/* Primary Button Styling */
 .primary-btn {
-    background: var(--theme-primary) !important;
-    color: #123F45 !important;
-    border: 1px solid var(--theme-accent-dark) !important;
-    box-shadow: 0 3px 10px rgba(143, 250, 250, .18);
+    background: var(--theme-gradient) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
+
 .primary-btn:hover {
-    background: var(--theme-secondary) !important;
-    color: #123F45 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35) !important;
+    filter: brightness(1.05);
+}
+
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+.secondary-btn {
+    border-radius: 10px !important;
+    border: 1px solid var(--theme-border) !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+.secondary-btn:hover {
+    background: var(--theme-bg-soft) !important;
+    color: var(--theme-text) !important;
+    border-color: var(--theme-muted) !important;
+}
+
+/* Card Improvements */
+.stat-card,
+.action-card,
+.detail-card,
+.form-card,
+.table-card,
+.house-block,
+.pregnancy-reminder,
+.all-pregnant-members,
+.age-range-card {
+    background: var(--theme-surface) !important;
+    border: 1px solid var(--theme-border) !important;
+    border-radius: 16px !important;
+    box-shadow: var(--theme-card-shadow) !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+.stat-card:hover,
+.action-card:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: var(--theme-card-shadow-hover) !important;
     border-color: var(--theme-primary) !important;
 }
-html[data-theme="dark"] .primary-btn,
-html[data-theme="neon"] .primary-btn {
-    background: var(--theme-primary) !important;
-    color: #071D20 !important;
+
+/* Inputs & Form Elements */
+input, textarea, select {
+    border-radius: 10px !important;
+    border: 1.5px solid var(--theme-border) !important;
+    transition: all 0.2s ease !important;
 }
-html[data-theme="neon"] .primary-btn {
-    box-shadow: 0 0 10px rgba(143, 250, 250, .55), 0 0 20px rgba(143, 250, 250, .18);
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--theme-primary) !important;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
 }
-html[data-theme="neon"] .primary-btn:hover {
-    box-shadow: 0 0 14px rgba(187, 252, 252, .75), 0 0 26px rgba(143, 250, 250, .28);
+
+/* Dark mode overrides */
+html[data-theme="dark"] body {
+    background: var(--theme-bg) !important;
+    color: var(--theme-text) !important;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+    background-color: var(--theme-bg-soft) !important;
+    color: var(--theme-text) !important;
+}
+
+html[data-theme="dark"] .secondary-btn {
+    background: var(--theme-surface) !important;
+    color: var(--theme-text) !important;
+}
+
+/* Neon Theme Special Polish */
+html[data-theme="neon"] .stat-card,
+html[data-theme="neon"] .action-card {
+    border-color: rgba(0, 242, 254, 0.4) !important;
+}
+html[data-theme="neon"] .stat-card:hover,
+html[data-theme="neon"] .action-card:hover {
+    border-color: #00f2fe !important;
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.4) !important;
 }

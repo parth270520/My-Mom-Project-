@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Family, Member
+from .models import Family, Member, Village, Attendance
 
 
 @admin.register(Family)
@@ -56,3 +56,26 @@ class MemberAdmin(admin.ModelAdmin):
         'bpl',
         'currently_pregnant',
     )
+
+
+@admin.register(Village)
+class VillageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'village_number', 'name', 'total_houses')
+    search_fields = ('village_number', 'name')
+
+
+@admin.register(Attendance)
+class AttendanceAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'date',
+        'status',
+        'duty_type',
+        'village',
+        'check_in_time',
+        'check_out_time',
+        'home_visits_count',
+        'patients_attended',
+    )
+    list_filter = ('status', 'duty_type', 'date')
+    search_fields = ('tasks_completed', 'remarks')

@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Attendance Record - ASHA Care</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+<body>
+
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="small-logo">A</div>
+            <div>
+                <h2>ASHA Care</h2>
+                <span>Healthcare Portal</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item"><span>▣</span> Dashboard</a>
+            <a href="{% url 'attendance_list' %}" class="nav-item active"><span>⏱</span> Daily Attendance</a>
+            <a href="{% url 'add_village' %}" class="nav-item"><span>⌂</span> Add Village</a>
+            <a href="{% url 'add_family' %}" class="nav-item"><span>+</span> Add Family</a>
+            <a href="{% url 'family_list' %}" class="nav-item"><span>⌂</span> Family List</a>
+            <a href="{% url 'add_member' %}" class="nav-item"><span>+</span> Add Member</a>
+            <a href="{% url 'member_list' %}" class="nav-item"><span>♙</span> Member List</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{% url 'logout' %}" class="nav-item logout"><span>↪</span> Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <h1>Delete Attendance Record</h1>
+                <p>Are you sure you want to remove this record?</p>
+            </div>
+            <a href="{% url 'attendance_list' %}" class="secondary-btn">← Back</a>
+        </header>
+
+        <section class="dashboard-content" style="max-width: 600px; margin: 40px auto;">
+            <div class="form-card" style="padding: 35px; text-align: center; background: var(--theme-surface); border: 1px solid var(--theme-border); border-radius: 18px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                <h2 style="font-size: 22px; margin-bottom: 12px; color: var(--theme-text);">Confirm Deletion</h2>
+                <p style="color: var(--theme-muted); margin-bottom: 24px; line-height: 1.6;">
+                    Are you sure you want to permanently delete the attendance record for 
+                    <strong>{{ attendance.date|date:"l, d F Y" }}</strong> ({{ attendance.duty_type }})?
+                </p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div style="display: flex; gap: 14px; justify-content: center;">
+                        <a href="{% url 'attendance_list' %}" class="secondary-btn" style="padding: 12px 24px;">Cancel</a>
+                        <button type="submit" class="primary-btn" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; padding: 12px 24px;">
+                            Yes, Delete Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="{% static 'js/theme.js' %}"></script>
+</body>
+</html>

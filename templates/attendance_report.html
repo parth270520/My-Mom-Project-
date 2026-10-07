@@ -1,0 +1,229 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Nurse Duty & Attendance Register - {{ month_name }} {{ year }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .report-sheet {
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 1px solid #cbd5e1;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .report-header {
+            text-align: center;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .report-header h1 {
+            font-size: 24px;
+            margin: 0 0 6px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .report-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #334155;
+            margin: 0 0 10px 0;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .summary-stats-box {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .stat-item {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            background: #ffffff;
+        }
+
+        .stat-item span {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .stat-item strong {
+            font-size: 20px;
+            color: #0284c7;
+        }
+
+        table.duty-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-bottom: 40px;
+        }
+
+        table.duty-table th, table.duty-table td {
+            border: 1px solid #94a3b8;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        table.duty-table th {
+            background: #e2e8f0;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            padding-top: 20px;
+        }
+
+        .signature-box {
+            text-align: center;
+            width: 250px;
+            border-top: 1px dashed #64748b;
+            padding-top: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .print-btn-bar {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        @media print {
+            body { padding: 0; }
+            .report-sheet { border: none; box-shadow: none; padding: 0; }
+            .print-btn-bar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="print-btn-bar">
+    <button onclick="window.print()" class="primary-btn" style="padding: 10px 24px; font-size: 15px; cursor: pointer;">
+        🖨️ Print / Save as PDF
+    </button>
+    <button onclick="window.close()" class="secondary-btn" style="padding: 10px 20px; font-size: 15px; margin-left: 10px; cursor: pointer;">
+        Close Window
+    </button>
+</div>
+
+<div class="report-sheet">
+    <div class="report-header">
+        <h1>ASHA Healthcare Worker Monthly Duty Register</h1>
+        <h2>Primary Health Center (PHC) Work & Attendance Diary</h2>
+        <p style="margin:0; font-size:13px; color:#64748b;">Ministry of Health & Family Welfare Community Healthcare Record</p>
+    </div>
+
+    <div class="meta-grid">
+        <div>
+            <strong>Healthcare Nurse:</strong> Sunita Sharma (ASHA)
+        </div>
+        <div>
+            <strong>Reporting Month:</strong> {{ month_name }} {{ year }}
+        </div>
+        <div>
+            <strong>Date Generated:</strong> {{ today|date:"d-m-Y" }}
+        </div>
+    </div>
+
+    <div class="summary-stats-box">
+        <div class="stat-item">
+            <span>Total Duty Records</span>
+            <strong>{{ total_records }}</strong>
+        </div>
+        <div class="stat-item">
+            <span>Days Present</span>
+            <strong>{{ days_present }}</strong>
+        </div>
+        <div class="stat-item">
+            <span>Home Visits</span>
+            <strong>{{ total_home_visits }}</strong>
+        </div>
+        <div class="stat-item">
+            <span>Patients Screened</span>
+            <strong>{{ total_patients_screened }}</strong>
+        </div>
+    </div>
+
+    <table class="duty-table">
+        <thead>
+            <tr>
+                <th style="width: 50px;">S.No</th>
+                <th style="width: 95px;">Date</th>
+                <th style="width: 90px;">Status</th>
+                <th>Duty Performed</th>
+                <th>Village Visited</th>
+                <th style="width: 120px;">Timing</th>
+                <th style="width: 90px;">Visits / Screened</th>
+                <th>Work Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rec in attendances %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ rec.date|date:"d-m-Y" }}</td>
+                    <td>{{ rec.status }}</td>
+                    <td><strong>{{ rec.duty_type }}</strong></td>
+                    <td>{{ rec.village.name|default:"Sub-Center" }}</td>
+                    <td>
+                        {{ rec.check_in_time|time:"h:i A"|default:"--" }} - {{ rec.check_out_time|time:"h:i A"|default:"--" }}
+                    </td>
+                    <td>{{ rec.home_visits_count }} / {{ rec.patients_attended }}</td>
+                    <td>{{ rec.tasks_completed|default:"Duty fulfilled" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align:center; padding: 20px;">No attendance records found for this month.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="signature-section">
+        <div class="signature-box">
+            Signature of ASHA Nurse
+        </div>
+        <div class="signature-box">
+            Signature of ANM / Medical Officer In-charge
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
