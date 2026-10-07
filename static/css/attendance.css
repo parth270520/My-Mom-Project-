@@ -1,0 +1,418 @@
+/* ==========================================================================
+   ASHA Care Attendance & Duty Tracker Styles
+   ========================================================================== */
+
+/* Hero Duty Banner (Used in Dashboard & Attendance Page) */
+.attendance-hero-card {
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(13, 148, 136, 0.08) 100%), var(--theme-surface) !important;
+    border: 1px solid var(--theme-border) !important;
+    border-radius: 18px !important;
+    padding: 24px 28px !important;
+    margin-bottom: 28px !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    box-shadow: var(--theme-card-shadow) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.attendance-hero-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--theme-gradient);
+    border-radius: 6px 0 0 6px;
+}
+
+.duty-info-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.duty-date-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--theme-primary);
+    background: var(--theme-accent-soft);
+    padding: 4px 12px;
+    border-radius: 9999px;
+}
+
+.duty-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--theme-text);
+    margin-bottom: 6px;
+}
+
+.duty-desc {
+    color: var(--theme-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 650px;
+}
+
+.duty-stats-inline {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.inline-stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--theme-text-2);
+    font-weight: 600;
+}
+
+.inline-stat-item span {
+    color: var(--theme-muted);
+    font-weight: 400;
+}
+
+.duty-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.checkin-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    padding: 12px 24px !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3) !important;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease !important;
+}
+
+.checkin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+.checkout-btn {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+    padding: 12px 24px !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3) !important;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease !important;
+}
+
+.checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4) !important;
+}
+
+/* Attendance Stats KPI Grid */
+.attendance-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.kpi-card {
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--theme-card-shadow);
+    transition: all 0.2s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--theme-card-shadow-hover);
+}
+
+.kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.kpi-icon.teal { background: #ccfbf1; color: #0d9488; }
+.kpi-icon.blue { background: #dbeafe; color: #2563eb; }
+.kpi-icon.emerald { background: #d1fae5; color: #059669; }
+.kpi-icon.amber { background: #fef3c7; color: #d97706; }
+.kpi-icon.purple { background: #f3e8ff; color: #7c3aed; }
+
+.kpi-content span {
+    font-size: 13px;
+    color: var(--theme-muted);
+    font-weight: 500;
+}
+
+.kpi-content h3 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--theme-text);
+    margin-top: 2px;
+}
+
+/* Toolbar & Filters */
+.attendance-toolbar {
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: var(--theme-card-shadow);
+}
+
+.attendance-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.attendance-filters select {
+    padding: 9px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid var(--theme-border);
+    border-radius: 10px;
+    background: var(--theme-bg-soft);
+    color: var(--theme-text);
+    outline: none;
+    cursor: pointer;
+}
+
+.attendance-filters select:focus {
+    border-color: var(--theme-primary);
+}
+
+/* Table Card */
+.attendance-table-card {
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--theme-card-shadow);
+    margin-bottom: 30px;
+}
+
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.attendance-table th {
+    background: var(--theme-bg-soft);
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--theme-text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--theme-border);
+}
+
+.attendance-table td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--theme-text);
+    border-bottom: 1px solid var(--theme-border-soft);
+    vertical-align: middle;
+}
+
+.attendance-table tr:hover td {
+    background-color: var(--theme-accent-soft);
+}
+
+.date-pill {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-pill-main {
+    font-weight: 700;
+    color: var(--theme-text);
+}
+
+.date-pill-day {
+    font-size: 12px;
+    color: var(--theme-muted);
+}
+
+.time-range {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--theme-text-2);
+}
+
+.table-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.table-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.table-btn-edit {
+    background: var(--theme-bg-soft);
+    color: var(--theme-text-2);
+    border: 1px solid var(--theme-border);
+}
+
+.table-btn-edit:hover {
+    background: var(--theme-primary);
+    color: #ffffff;
+    border-color: var(--theme-primary);
+}
+
+.table-btn-delete {
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
+}
+
+.table-btn-delete:hover {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+/* Modal Styling */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-box {
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 640px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+    padding: 30px;
+    position: relative;
+    animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--theme-border);
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--theme-text);
+}
+
+.modal-close-btn {
+    background: var(--theme-bg-soft);
+    border: 1px solid var(--theme-border);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--theme-muted);
+}
+
+.modal-close-btn:hover {
+    color: var(--theme-text);
+    background: var(--theme-border);
+}
+
+@media (max-width: 768px) {
+    .attendance-hero-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .duty-action-buttons {
+        width: 100%;
+    }
+
+    .checkin-btn, .checkout-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

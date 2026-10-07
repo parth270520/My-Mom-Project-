@@ -1,0 +1,475 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Attendance & Duty Log - ASHA Care</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="small-logo">A</div>
+            <div>
+                <h2>ASHA Care</h2>
+                <span>Healthcare Portal</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item">
+                <span>▣</span> Dashboard
+            </a>
+            <a href="{% url 'attendance_list' %}" class="nav-item active">
+                <span>⏱</span> Daily Attendance
+            </a>
+            <a href="{% url 'add_village' %}" class="nav-item">
+                <span>⌂</span> Add Village
+            </a>
+            <a href="{% url 'add_family' %}" class="nav-item">
+                <span>+</span> Add Family
+            </a>
+            <a href="{% url 'family_list' %}" class="nav-item">
+                <span>⌂</span> Family List
+            </a>
+            <a href="{% url 'add_member' %}" class="nav-item">
+                <span>+</span> Add Member
+            </a>
+            <a href="{% url 'member_list' %}" class="nav-item">
+                <span>♙</span> Member List
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{% url 'logout' %}" class="nav-item logout">
+                <span>↪</span> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <div>
+                <h1>Daily Attendance & Duty Register</h1>
+                <p>Track your daily shifts, field duties, home visits, and health camps.</p>
+            </div>
+
+            <div class="user-profile">
+                <div class="avatar">{{ request.user.username|first|upper }}</div>
+                <div>
+                    <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+                    <span>Dedicated Healthcare Nurse</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-content">
+
+            <!-- MESSAGES CONTAINER -->
+            {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="alert-message {{ message.tags }}">
+                            <span>🔔</span> {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- =========================================
+                 TODAY'S DUTY & QUICK CHECK-IN HERO
+            ========================================== -->
+            <div class="attendance-hero-card">
+                <div>
+                    <div class="duty-info-header">
+                        <span class="duty-date-chip">📅 {{ today|date:"l, d F Y" }}</span>
+                        {% if today_record %}
+                            {% if today_record.status == 'Present' %}
+                                <span class="badge badge-present">● Present</span>
+                            {% elif today_record.status == 'Field Duty' %}
+                                <span class="badge badge-field">● Field Duty</span>
+                            {% elif today_record.status == 'Camp Duty' %}
+                                <span class="badge badge-camp">● Health Camp</span>
+                            {% elif today_record.status == 'Half Day' %}
+                                <span class="badge badge-half">● Half Day</span>
+                            {% else %}
+                                <span class="badge badge-leave">● On Leave</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge badge-half">⚠️ Not Checked In Today</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="duty-title">
+                        {% if today_record %}
+                            {{ today_record.duty_type }}
+                            {% if today_record.village %}
+                                • {{ today_record.village.name }}
+                            {% endif %}
+                        {% else %}
+                            Ready to begin your nursing duty today?
+                        {% endif %}
+                    </div>
+
+                    <p class="duty-desc">
+                        {% if today_record %}
+                            {{ today_record.tasks_completed|default:"Duty in progress. Update your home visits and tasks completed anytime." }}
+                        {% else %}
+                            Click "Quick Check-In" to log your arrival time or open the full form to specify village field duty.
+                        {% endif %}
+                    </p>
+
+                    {% if today_record %}
+                        <div class="duty-stats-inline">
+                            <div class="inline-stat-item">
+                                🕒 Checked in: <span>{{ today_record.check_in_time|time:"h:i A"|default:"--" }}</span>
+                            </div>
+                            <div class="inline-stat-item">
+                                🏁 Checked out: <span>{{ today_record.check_out_time|time:"h:i A"|default:"Duty Ongoing" }}</span>
+                            </div>
+                            <div class="inline-stat-item">
+                                🏡 Home visits: <span>{{ today_record.home_visits_count }}</span>
+                            </div>
+                            <div class="inline-stat-item">
+                                🩺 Patients attended: <span>{{ today_record.patients_attended }}</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="duty-action-buttons">
+                    {% if not today_record %}
+                        <form method="POST" action="{% url 'mark_attendance' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="quick_check_in">
+                            <button type="submit" class="checkin-btn">
+                                <span>🟢</span> Quick Check-In
+                            </button>
+                        </form>
+                    {% elif not today_record.check_out_time %}
+                        <form method="POST" action="{% url 'mark_attendance' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="quick_check_out">
+                            <button type="submit" class="checkout-btn">
+                                <span>🏁</span> End Shift (Check Out)
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    <button type="button" class="primary-btn" onclick="openAttendanceModal()">
+                        <span>+</span> Log / Edit Duty Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- =========================================
+                 MONTHLY SUMMARY KPIS
+            ========================================== -->
+            <div class="attendance-kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon teal">📅</div>
+                    <div class="kpi-content">
+                        <span>Total Records</span>
+                        <h3>{{ total_records }}</h3>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon emerald">✅</div>
+                    <div class="kpi-content">
+                        <span>Days on Duty</span>
+                        <h3>{{ days_present }}</h3>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon blue">🏡</div>
+                    <div class="kpi-content">
+                        <span>Home Visits</span>
+                        <h3>{{ total_home_visits }}</h3>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon purple">🩺</div>
+                    <div class="kpi-content">
+                        <span>Patients Screened</span>
+                        <h3>{{ total_patients_screened }}</h3>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon amber">⏳</div>
+                    <div class="kpi-content">
+                        <span>Half Days / Leaves</span>
+                        <h3>{{ days_half }} / {{ days_leave }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =========================================
+                 FILTER TOOLBAR
+            ========================================== -->
+            <div class="attendance-toolbar">
+                <form method="GET" class="attendance-filters">
+                    <select name="month" onchange="this.form.submit()">
+                        {% for m_num, m_name in months %}
+                            <option value="{{ m_num }}" {% if selected_month == m_num %}selected{% endif %}>
+                                {{ m_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="year" onchange="this.form.submit()">
+                        {% for y in years %}
+                            <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>
+                                {{ y }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="status" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="Present" {% if selected_status == 'Present' %}selected{% endif %}>Present</option>
+                        <option value="Field Duty" {% if selected_status == 'Field Duty' %}selected{% endif %}>Field Duty</option>
+                        <option value="Camp Duty" {% if selected_status == 'Camp Duty' %}selected{% endif %}>Camp Duty</option>
+                        <option value="Half Day" {% if selected_status == 'Half Day' %}selected{% endif %}>Half Day</option>
+                        <option value="On Leave" {% if selected_status == 'On Leave' %}selected{% endif %}>On Leave</option>
+                    </select>
+                </form>
+
+                <div style="display:flex; gap:12px;">
+                    <a href="{% url 'attendance_report' %}?month={{ selected_month }}&year={{ selected_year }}" target="_blank" class="secondary-btn">
+                        <span>🖨️</span> Print Monthly Register
+                    </a>
+                    <button type="button" class="primary-btn" onclick="openAttendanceModal()">
+                        <span>+</span> New Attendance Entry
+                    </button>
+                </div>
+            </div>
+
+            <!-- =========================================
+                 ATTENDANCE LOGS TABLE
+            ========================================== -->
+            <div class="attendance-table-card">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Duty Type</th>
+                            <th>Village</th>
+                            <th>Timing</th>
+                            <th>Visits / Patients</th>
+                            <th>Daily Summary</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in attendances %}
+                            <tr>
+                                <td>
+                                    <div class="date-pill">
+                                        <span class="date-pill-main">{{ record.date|date:"d M Y" }}</span>
+                                        <span class="date-pill-day">{{ record.date|date:"l" }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if record.status == 'Present' %}
+                                        <span class="badge badge-present">Present</span>
+                                    {% elif record.status == 'Field Duty' %}
+                                        <span class="badge badge-field">Field Duty</span>
+                                    {% elif record.status == 'Camp Duty' %}
+                                        <span class="badge badge-camp">Camp Duty</span>
+                                    {% elif record.status == 'Half Day' %}
+                                        <span class="badge badge-half">Half Day</span>
+                                    {% else %}
+                                        <span class="badge badge-leave">Leave</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ record.duty_type }}</strong>
+                                </td>
+                                <td>
+                                    {{ record.village.name|default:"Sub-Center / PHC" }}
+                                </td>
+                                <td>
+                                    <span class="time-range">
+                                        {{ record.check_in_time|time:"h:i A"|default:"--" }}
+                                        –
+                                        {{ record.check_out_time|time:"h:i A"|default:"Ongoing" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="font-size:13px;">
+                                        🏡 <strong>{{ record.home_visits_count }}</strong> visits<br>
+                                        🩺 <strong>{{ record.patients_attended }}</strong> patients
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="max-width:240px; font-size:13px; color:var(--theme-text-2);">
+                                        {{ record.tasks_completed|truncatechars:70|default:"--" }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a href="{% url 'edit_attendance' record.id %}" class="table-btn table-btn-edit">
+                                            ✏️ Edit
+                                        </a>
+                                        <a href="{% url 'delete_attendance' record.id %}" class="table-btn table-btn-delete">
+                                            🗑️
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" style="text-align:center; padding: 40px; color:var(--theme-muted);">
+                                    <div style="font-size:32px; margin-bottom:10px;">📋</div>
+                                    <h3>No attendance records found for this period</h3>
+                                    <p style="margin-top:5px;">Click "Log / Edit Duty Details" above to record your attendance.</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+    </main>
+
+</div>
+
+<!-- =========================================
+     MARK / LOG ATTENDANCE MODAL
+========================================== -->
+<div class="modal-overlay" id="attendanceModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Log Daily Duty & Attendance</h3>
+            <button type="button" class="modal-close-btn" onclick="closeAttendanceModal()">✕</button>
+        </div>
+
+        <form method="POST" action="{% url 'mark_attendance' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="full_save">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Date <span>*</span></label>
+                    <input type="date" name="date" value="{{ today|date:'Y-m-d' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Status <span>*</span></label>
+                    <select name="status" required>
+                        <option value="Present" {% if today_record and today_record.status == 'Present' %}selected{% endif %}>Present (Full Day)</option>
+                        <option value="Field Duty" {% if today_record and today_record.status == 'Field Duty' %}selected{% endif %}>Field Duty / Home Visits</option>
+                        <option value="Camp Duty" {% if today_record and today_record.status == 'Camp Duty' %}selected{% endif %}>Immunization / Health Camp</option>
+                        <option value="Half Day" {% if today_record and today_record.status == 'Half Day' %}selected{% endif %}>Half Day</option>
+                        <option value="On Leave" {% if today_record and today_record.status == 'On Leave' %}selected{% endif %}>On Leave</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Duty Type <span>*</span></label>
+                <select name="duty_type" required>
+                    <option value="Routine Sub-Center Duty">Routine Sub-Center Duty</option>
+                    <option value="Home Visits & Door-to-Door Survey" selected>Home Visits & Door-to-Door Survey</option>
+                    <option value="Maternal & Child Health Checkup">Maternal & Child Health Checkup</option>
+                    <option value="Pulse Polio / Immunization Drive">Pulse Polio / Immunization Drive</option>
+                    <option value="Ayushman / ABHA Registration Camp">Ayushman / ABHA Registration Camp</option>
+                    <option value="PHC / CHC Meeting & Training">PHC / CHC Meeting & Training</option>
+                    <option value="Emergency Response">Emergency Response</option>
+                    <option value="Other">Other Duty</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Village Visited (Optional)</label>
+                <select name="village">
+                    <option value="">-- None / Sub-Center --</option>
+                    {% for v in villages %}
+                        <option value="{{ v.id }}" {% if today_record and today_record.village_id == v.id %}selected{% endif %}>
+                            Village {{ v.village_number }} - {{ v.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Check-In Time</label>
+                    <input type="time" name="check_in_time" value="{{ today_record.check_in_time|time:'H:i'|default:now_time }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Check-Out Time</label>
+                    <input type="time" name="check_out_time" value="{{ today_record.check_out_time|time:'H:i' }}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Home Visits Conducted</label>
+                    <input type="number" name="home_visits_count" min="0" value="{{ today_record.home_visits_count|default:0 }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Patients Screened / Attended</label>
+                    <input type="number" name="patients_attended" min="0" value="{{ today_record.patients_attended|default:0 }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Summary of Work Completed</label>
+                <textarea name="tasks_completed" rows="3" placeholder="e.g. Visited Ward 2, administered 12 vaccines, checked 2 pregnant mothers...">{{ today_record.tasks_completed|default:'' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Remarks / Notes</label>
+                <input type="text" name="remarks" placeholder="Optional notes..." value="{{ today_record.remarks|default:'' }}">
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="secondary-btn" onclick="closeAttendanceModal()">Cancel</button>
+                <button type="submit" class="primary-btn">Save Attendance Record</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openAttendanceModal() {
+        document.getElementById('attendanceModal').classList.add('active');
+    }
+
+    function closeAttendanceModal() {
+        document.getElementById('attendanceModal').classList.remove('active');
+    }
+
+    document.getElementById('attendanceModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAttendanceModal();
+        }
+    });
+</script>
+
+<script src="{% static 'js/theme.js' %}"></script>
+</body>
+</html>

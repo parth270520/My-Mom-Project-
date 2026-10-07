@@ -14,9 +14,10 @@ from django.utils.http import (
     urlsafe_base64_encode
 )
 
-from django.db.models import Q
+from django.contrib import messages
+from django.db.models import Q, Sum
 
-from .models import Family, Member, Village
+from .models import Family, Member, Village, Attendance
 from django.http import JsonResponse
 
 
@@ -207,47 +208,53 @@ def dashboard(request):
         )
     )
 
+    # =====================================================
+    # ATTENDANCE & DUTY TRACKING
+    # =====================================================
+    today_attendance = Attendance.objects.filter(date=today).first()
+    recent_attendances = Attendance.objects.select_related('village').order_by('-date', '-check_in_time')[:5]
+    total_villages = Village.objects.count()
+
+    this_month_visits = Attendance.objects.filter(
+        date__year=today.year,
+        date__month=today.month
+    ).aggregate(total=Sum('home_visits_count'))['total'] or 0
+
+    this_month_patients = Attendance.objects.filter(
+        date__year=today.year,
+        date__month=today.month
+    ).aggregate(total=Sum('patients_attended'))['total'] or 0
+
+    this_month_present_days = Attendance.objects.filter(
+        date__year=today.year,
+        date__month=today.month,
+        status__in=['Present', 'Field Duty', 'Camp Duty', 'Half Day']
+    ).count()
+
     return render(
         request,
         'dashboard.html',
         {
             'total_families': total_families,
-
             'total_members': total_members,
-
-            'total_male_members': (
-                total_male_members
-            ),
-
-            'total_female_members': (
-                total_female_members
-            ),
-
-            'total_pregnant': (
-                total_pregnant
-            ),
-
-            'ayushman_card_submitted': (
-                ayushman_card_submitted
-            ),
-
-            'ayushman_card_pending': (
-                ayushman_card_pending
-            ),
-
-            'abha_card_pending': (
-                abha_card_pending
-            ),
-
-            'pregnant_members': (
-                pregnant_members
-            ),
-
-            'pregnant_due_this_month': (
-                pregnant_due_this_month
-            ),
+            'total_male_members': total_male_members,
+            'total_female_members': total_female_members,
+            'total_pregnant': total_pregnant,
+            'total_villages': total_villages,
+            'ayushman_card_submitted': ayushman_card_submitted,
+            'ayushman_card_pending': ayushman_card_pending,
+            'abha_card_pending': abha_card_pending,
+            'pregnant_members': pregnant_members,
+            'pregnant_due_this_month': pregnant_due_this_month,
+            'today_attendance': today_attendance,
+            'recent_attendances': recent_attendances,
+            'this_month_visits': this_month_visits,
+            'this_month_patients': this_month_patients,
+            'this_month_present_days': this_month_present_days,
+            'today': today,
         }
     )
+
 
 
 # =========================================================
@@ -1668,3 +1675,309 @@ def age_range_members(request):
             'max_age': max_age,
         }
     )
+
+
+# =========================================================
+# ATTENDANCE MANAGEMENT
+# =========================================================
+
+@login_required
+def attendance_list(request):
+    from django.utils import timezone
+
+    today = timezone.localdate()
+    now_time = timezone.localtime().strftime('%H:%M')
+
+    selected_year = request.GET.get('year', '')
+    selected_month = request.GET.get('month', '')
+    selected_status = request.GET.get('status', '')
+
+    try:
+        selected_year = int(selected_year) if selected_year else today.year
+    except ValueError:
+        selected_year = today.year
+
+    try:
+        selected_month = int(selected_month) if selected_month else today.month
+    except ValueError:
+        selected_month = today.month
+
+    attendances = Attendance.objects.select_related('village').filter(
+        date__year=selected_year,
+        date__month=selected_month
+    )
+
+    if selected_status:
+        attendances = attendances.filter(status=selected_status)
+
+    attendances = attendances.order_by('-date', '-check_in_time')
+
+    # Aggregates for the selected period
+    base_qs = Attendance.objects.filter(
+        date__year=selected_year,
+        date__month=selected_month
+    )
+
+    total_records = base_qs.count()
+    days_present = base_qs.filter(status__in=['Present', 'Field Duty', 'Camp Duty']).count()
+    days_half = base_qs.filter(status='Half Day').count()
+    days_leave = base_qs.filter(status='On Leave').count()
+    total_home_visits = base_qs.aggregate(total=Sum('home_visits_count'))['total'] or 0
+    total_patients_screened = base_qs.aggregate(total=Sum('patients_attended'))['total'] or 0
+
+    today_record = Attendance.objects.filter(date=today).first()
+    villages = Village.objects.order_by('name')
+
+    years = [today.year - 1, today.year, today.year + 1]
+
+    months = [
+        (1, 'January'), (2, 'February'), (3, 'March'), (4, 'April'),
+        (5, 'May'), (6, 'June'), (7, 'July'), (8, 'August'),
+        (9, 'September'), (10, 'October'), (11, 'November'), (12, 'December')
+    ]
+
+    return render(request, 'attendance_list.html', {
+        'attendances': attendances,
+        'today': today,
+        'now_time': now_time,
+        'today_record': today_record,
+        'villages': villages,
+        'selected_year': selected_year,
+        'selected_month': selected_month,
+        'selected_status': selected_status,
+        'years': years,
+        'months': months,
+        'total_records': total_records,
+        'days_present': days_present,
+        'days_half': days_half,
+        'days_leave': days_leave,
+        'total_home_visits': total_home_visits,
+        'total_patients_screened': total_patients_screened,
+    })
+
+
+@login_required
+def mark_attendance(request):
+    from django.utils import timezone
+    from datetime import datetime
+
+    today = timezone.localdate()
+    now_time = timezone.localtime().time()
+
+    if request.method == 'POST':
+        action = request.POST.get('action', 'save')
+        record_date_str = request.POST.get('date', '')
+        if record_date_str:
+            try:
+                record_date = datetime.strptime(record_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                record_date = today
+        else:
+            record_date = today
+
+        attendance = Attendance.objects.filter(date=record_date).first()
+
+        if action == 'quick_check_in':
+            if not attendance:
+                attendance = Attendance.objects.create(
+                    date=record_date,
+                    check_in_time=now_time,
+                    status='Present',
+                    duty_type='Routine Sub-Center Duty'
+                )
+                messages.success(request, f"Checked in successfully at {now_time.strftime('%I:%M %p')}!")
+            else:
+                if not attendance.check_in_time:
+                    attendance.check_in_time = now_time
+                    attendance.save()
+                    messages.success(request, f"Check-in time recorded: {now_time.strftime('%I:%M %p')}.")
+                else:
+                    messages.info(request, f"Already checked in today at {attendance.check_in_time.strftime('%I:%M %p')}.")
+
+        elif action == 'quick_check_out':
+            if not attendance:
+                attendance = Attendance.objects.create(
+                    date=record_date,
+                    check_out_time=now_time,
+                    status='Present'
+                )
+                messages.success(request, f"Checked out successfully at {now_time.strftime('%I:%M %p')}!")
+            else:
+                attendance.check_out_time = now_time
+                attendance.save()
+                messages.success(request, f"Checked out recorded at {now_time.strftime('%I:%M %p')}. Duty completed!")
+
+        else:
+            status = request.POST.get('status', 'Present')
+            duty_type = request.POST.get('duty_type', 'Routine Sub-Center Duty')
+            check_in_str = request.POST.get('check_in_time', '').strip()
+            check_out_str = request.POST.get('check_out_time', '').strip()
+            village_id = request.POST.get('village', '')
+            home_visits_count = request.POST.get('home_visits_count', 0)
+            patients_attended = request.POST.get('patients_attended', 0)
+            tasks_completed = request.POST.get('tasks_completed', '').strip()
+            remarks = request.POST.get('remarks', '').strip()
+
+            village = None
+            if village_id:
+                village = Village.objects.filter(id=village_id).first()
+
+            check_in_time = None
+            if check_in_str:
+                try:
+                    check_in_time = datetime.strptime(check_in_str, '%H:%M').time()
+                except ValueError:
+                    pass
+
+            check_out_time = None
+            if check_out_str:
+                try:
+                    check_out_time = datetime.strptime(check_out_str, '%H:%M').time()
+                except ValueError:
+                    pass
+
+            try:
+                home_visits_count = max(0, int(home_visits_count))
+            except (ValueError, TypeError):
+                home_visits_count = 0
+
+            try:
+                patients_attended = max(0, int(patients_attended))
+            except (ValueError, TypeError):
+                patients_attended = 0
+
+            if not attendance:
+                attendance = Attendance(date=record_date)
+
+            attendance.status = status
+            attendance.duty_type = duty_type
+            if check_in_time:
+                attendance.check_in_time = check_in_time
+            if check_out_time:
+                attendance.check_out_time = check_out_time
+            attendance.village = village
+            attendance.home_visits_count = home_visits_count
+            attendance.patients_attended = patients_attended
+            attendance.tasks_completed = tasks_completed
+            attendance.remarks = remarks
+            attendance.save()
+
+            messages.success(request, f"Attendance record for {record_date.strftime('%d %b %Y')} saved successfully!")
+
+        redirect_url = request.POST.get('next', 'attendance_list')
+        if redirect_url == 'dashboard':
+            return redirect('dashboard')
+        return redirect('attendance_list')
+
+    return redirect('attendance_list')
+
+
+@login_required
+def edit_attendance(request, attendance_id):
+    from datetime import datetime
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+    villages = Village.objects.order_by('name')
+
+    if request.method == 'POST':
+        attendance.status = request.POST.get('status', attendance.status)
+        attendance.duty_type = request.POST.get('duty_type', attendance.duty_type)
+        
+        check_in_str = request.POST.get('check_in_time', '').strip()
+        check_out_str = request.POST.get('check_out_time', '').strip()
+        
+        if check_in_str:
+            try:
+                attendance.check_in_time = datetime.strptime(check_in_str, '%H:%M').time()
+            except ValueError:
+                pass
+        else:
+            attendance.check_in_time = None
+
+        if check_out_str:
+            try:
+                attendance.check_out_time = datetime.strptime(check_out_str, '%H:%M').time()
+            except ValueError:
+                pass
+        else:
+            attendance.check_out_time = None
+
+        village_id = request.POST.get('village', '')
+        attendance.village = Village.objects.filter(id=village_id).first() if village_id else None
+
+        try:
+            attendance.home_visits_count = max(0, int(request.POST.get('home_visits_count', 0)))
+        except (ValueError, TypeError):
+            attendance.home_visits_count = 0
+
+        try:
+            attendance.patients_attended = max(0, int(request.POST.get('patients_attended', 0)))
+        except (ValueError, TypeError):
+            attendance.patients_attended = 0
+
+        attendance.tasks_completed = request.POST.get('tasks_completed', '').strip()
+        attendance.remarks = request.POST.get('remarks', '').strip()
+        attendance.save()
+
+        messages.success(request, "Attendance record updated successfully!")
+        return redirect('attendance_list')
+
+    return render(request, 'attendance_edit.html', {
+        'attendance': attendance,
+        'villages': villages,
+    })
+
+
+@login_required
+def delete_attendance(request, attendance_id):
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+    if request.method == 'POST':
+        attendance.delete()
+        messages.success(request, "Attendance record removed.")
+        return redirect('attendance_list')
+    return render(request, 'attendance_confirm_delete.html', {'attendance': attendance})
+
+
+@login_required
+def attendance_report(request):
+    from django.utils import timezone
+    today = timezone.localdate()
+
+    selected_year = request.GET.get('year', '')
+    selected_month = request.GET.get('month', '')
+
+    try:
+        selected_year = int(selected_year) if selected_year else today.year
+    except ValueError:
+        selected_year = today.year
+
+    try:
+        selected_month = int(selected_month) if selected_month else today.month
+    except ValueError:
+        selected_month = today.month
+
+    attendances = Attendance.objects.select_related('village').filter(
+        date__year=selected_year,
+        date__month=selected_month
+    ).order_by('date')
+
+    total_records = attendances.count()
+    days_present = attendances.filter(status__in=['Present', 'Field Duty', 'Camp Duty']).count()
+    total_home_visits = attendances.aggregate(total=Sum('home_visits_count'))['total'] or 0
+    total_patients_screened = attendances.aggregate(total=Sum('patients_attended'))['total'] or 0
+
+    months_dict = {
+        1: 'January', 2: 'February', 3: 'March', 4: 'April',
+        5: 'May', 6: 'June', 7: 'July', 8: 'August',
+        9: 'September', 10: 'October', 11: 'November', 12: 'December'
+    }
+
+    return render(request, 'attendance_report.html', {
+        'attendances': attendances,
+        'month_name': months_dict.get(selected_month, ''),
+        'year': selected_year,
+        'today': today,
+        'total_records': total_records,
+        'days_present': days_present,
+        'total_home_visits': total_home_visits,
+        'total_patients_screened': total_patients_screened,
+    })

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Family(models.Model):
@@ -218,3 +219,62 @@ class Village(models.Model):
 
     def __str__(self):
         return f"{self.village_number} - {self.name}"
+
+
+class Attendance(models.Model):
+    STATUS_CHOICES = [
+        ('Present', 'Present (Full Day)'),
+        ('Half Day', 'Half Day'),
+        ('Field Duty', 'Field Duty / Home Visits'),
+        ('Camp Duty', 'Immunization / Health Camp'),
+        ('On Leave', 'On Leave / Holiday'),
+    ]
+
+    DUTY_TYPE_CHOICES = [
+        ('Routine Sub-Center Duty', 'Routine Sub-Center Duty'),
+        ('Home Visits & Door-to-Door Survey', 'Home Visits & Door-to-Door Survey'),
+        ('Maternal & Child Health Checkup', 'Maternal & Child Health Checkup'),
+        ('Pulse Polio / Immunization Drive', 'Pulse Polio / Immunization Drive'),
+        ('Ayushman / ABHA Registration Camp', 'Ayushman / ABHA Registration Camp'),
+        ('PHC / CHC Meeting & Training', 'PHC / CHC Meeting & Training'),
+        ('Emergency Response', 'Emergency Response'),
+        ('Other', 'Other Duty'),
+    ]
+
+    date = models.DateField(default=timezone.localdate)
+    check_in_time = models.TimeField(null=True, blank=True)
+    check_out_time = models.TimeField(null=True, blank=True)
+    status = models.CharField(
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default='Present'
+    )
+    duty_type = models.CharField(
+        max_length=60,
+        choices=DUTY_TYPE_CHOICES,
+        default='Routine Sub-Center Duty'
+    )
+    village = models.ForeignKey(
+        'Village',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='attendances'
+    )
+    home_visits_count = models.PositiveIntegerField(default=0)
+    patients_attended = models.PositiveIntegerField(default=0)
+    tasks_completed = models.TextField(
+        blank=True,
+        help_text="Summary of work completed today"
+    )
+    remarks = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-date', '-check_in_time']
+        verbose_name = 'Attendance'
+        verbose_name_plural = 'Attendance Records'
+
+    def __str__(self):
+        return f"{self.date} - {self.status}"

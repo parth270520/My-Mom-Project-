@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Attendance Record - ASHA Care</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+<body>
+
+<div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="small-logo">A</div>
+            <div>
+                <h2>ASHA Care</h2>
+                <span>Healthcare Portal</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item">
+                <span>▣</span> Dashboard
+            </a>
+            <a href="{% url 'attendance_list' %}" class="nav-item active">
+                <span>⏱</span> Daily Attendance
+            </a>
+            <a href="{% url 'add_village' %}" class="nav-item">
+                <span>⌂</span> Add Village
+            </a>
+            <a href="{% url 'add_family' %}" class="nav-item">
+                <span>+</span> Add Family
+            </a>
+            <a href="{% url 'family_list' %}" class="nav-item">
+                <span>⌂</span> Family List
+            </a>
+            <a href="{% url 'add_member' %}" class="nav-item">
+                <span>+</span> Add Member
+            </a>
+            <a href="{% url 'member_list' %}" class="nav-item">
+                <span>♙</span> Member List
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{% url 'logout' %}" class="nav-item logout">
+                <span>↪</span> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <h1>Edit Attendance Record</h1>
+                <p>Date: {{ attendance.date|date:"l, d F Y" }}</p>
+            </div>
+            <a href="{% url 'attendance_list' %}" class="secondary-btn">← Back to Attendance List</a>
+        </header>
+
+        <section class="dashboard-content" style="max-width: 800px; margin: 0 auto;">
+            <div class="form-card" style="padding: 30px; background: var(--theme-surface); border: 1px solid var(--theme-border); border-radius: 16px;">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Status <span>*</span></label>
+                            <select name="status" required>
+                                <option value="Present" {% if attendance.status == 'Present' %}selected{% endif %}>Present (Full Day)</option>
+                                <option value="Field Duty" {% if attendance.status == 'Field Duty' %}selected{% endif %}>Field Duty / Home Visits</option>
+                                <option value="Camp Duty" {% if attendance.status == 'Camp Duty' %}selected{% endif %}>Immunization / Health Camp</option>
+                                <option value="Half Day" {% if attendance.status == 'Half Day' %}selected{% endif %}>Half Day</option>
+                                <option value="On Leave" {% if attendance.status == 'On Leave' %}selected{% endif %}>On Leave</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Duty Type <span>*</span></label>
+                            <select name="duty_type" required>
+                                <option value="Routine Sub-Center Duty" {% if attendance.duty_type == 'Routine Sub-Center Duty' %}selected{% endif %}>Routine Sub-Center Duty</option>
+                                <option value="Home Visits & Door-to-Door Survey" {% if attendance.duty_type == 'Home Visits & Door-to-Door Survey' %}selected{% endif %}>Home Visits & Door-to-Door Survey</option>
+                                <option value="Maternal & Child Health Checkup" {% if attendance.duty_type == 'Maternal & Child Health Checkup' %}selected{% endif %}>Maternal & Child Health Checkup</option>
+                                <option value="Pulse Polio / Immunization Drive" {% if attendance.duty_type == 'Pulse Polio / Immunization Drive' %}selected{% endif %}>Pulse Polio / Immunization Drive</option>
+                                <option value="Ayushman / ABHA Registration Camp" {% if attendance.duty_type == 'Ayushman / ABHA Registration Camp' %}selected{% endif %}>Ayushman / ABHA Registration Camp</option>
+                                <option value="PHC / CHC Meeting & Training" {% if attendance.duty_type == 'PHC / CHC Meeting & Training' %}selected{% endif %}>PHC / CHC Meeting & Training</option>
+                                <option value="Emergency Response" {% if attendance.duty_type == 'Emergency Response' %}selected{% endif %}>Emergency Response</option>
+                                <option value="Other" {% if attendance.duty_type == 'Other' %}selected{% endif %}>Other Duty</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Village Visited</label>
+                        <select name="village">
+                            <option value="">-- None / Sub-Center --</option>
+                            {% for v in villages %}
+                                <option value="{{ v.id }}" {% if attendance.village_id == v.id %}selected{% endif %}>
+                                    Village {{ v.village_number }} - {{ v.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Check-In Time</label>
+                            <input type="time" name="check_in_time" value="{{ attendance.check_in_time|time:'H:i' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Check-Out Time</label>
+                            <input type="time" name="check_out_time" value="{{ attendance.check_out_time|time:'H:i' }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Home Visits Conducted</label>
+                            <input type="number" name="home_visits_count" min="0" value="{{ attendance.home_visits_count }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Patients Attended / Screened</label>
+                            <input type="number" name="patients_attended" min="0" value="{{ attendance.patients_attended }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Summary of Work Completed</label>
+                        <textarea name="tasks_completed" rows="4">{{ attendance.tasks_completed }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <input type="text" name="remarks" value="{{ attendance.remarks }}">
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="{% url 'attendance_list' %}" class="secondary-btn">Cancel</a>
+                        <button type="submit" class="primary-btn">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="{% static 'js/theme.js' %}"></script>
+</body>
+</html>

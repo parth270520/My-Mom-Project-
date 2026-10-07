@@ -25,6 +25,7 @@
     >
 
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
 
 </head>
 
@@ -76,6 +77,20 @@
                 </span>
 
                 Dashboard
+
+            </a>
+
+
+            <a
+                href="{% url 'attendance_list' %}"
+                class="nav-item"
+            >
+
+                <span>
+                    ⏱
+                </span>
+
+                Daily Attendance
 
             </a>
 
@@ -251,12 +266,111 @@
 
         <section class="dashboard-content">
 
+            <!-- MESSAGES CONTAINER -->
+            {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="alert-message {{ message.tags }}">
+                            <span>🔔</span> {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- =========================================
+                 TODAY'S NURSE DUTY & ATTENDANCE HERO
+            ========================================== -->
+            <div class="attendance-hero-card">
+                <div>
+                    <div class="duty-info-header">
+                        <span class="duty-date-chip">📅 {{ today|date:"l, d F Y" }}</span>
+                        {% if today_attendance %}
+                            {% if today_attendance.status == 'Present' %}
+                                <span class="badge badge-present">● Present</span>
+                            {% elif today_attendance.status == 'Field Duty' %}
+                                <span class="badge badge-field">● Field Duty</span>
+                            {% elif today_attendance.status == 'Camp Duty' %}
+                                <span class="badge badge-camp">● Health Camp</span>
+                            {% elif today_attendance.status == 'Half Day' %}
+                                <span class="badge badge-half">● Half Day</span>
+                            {% else %}
+                                <span class="badge badge-leave">● On Leave</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge badge-half">⚠️ Not Checked In Today</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="duty-title">
+                        {% if today_attendance %}
+                            {{ today_attendance.duty_type }}
+                            {% if today_attendance.village %}
+                                • {{ today_attendance.village.name }}
+                            {% endif %}
+                        {% else %}
+                            Ready to start your nursing duty today?
+                        {% endif %}
+                    </div>
+
+                    <p class="duty-desc">
+                        {% if today_attendance %}
+                            {{ today_attendance.tasks_completed|default:"Duty shift active. Keep recording health checks, door-to-door visits, and maternal follow-ups." }}
+                        {% else %}
+                            Click "Quick Check-In" to record your attendance, or view your full monthly duty register.
+                        {% endif %}
+                    </p>
+
+                    {% if today_attendance %}
+                        <div class="duty-stats-inline">
+                            <div class="inline-stat-item">
+                                🕒 In: <span>{{ today_attendance.check_in_time|time:"h:i A"|default:"--" }}</span>
+                            </div>
+                            <div class="inline-stat-item">
+                                🏁 Out: <span>{{ today_attendance.check_out_time|time:"h:i A"|default:"Duty Ongoing" }}</span>
+                            </div>
+                            <div class="inline-stat-item">
+                                🏡 Home visits: <span>{{ today_attendance.home_visits_count }}</span>
+                            </div>
+                            <div class="inline-stat-item">
+                                🩺 Patients seen: <span>{{ today_attendance.patients_attended }}</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="duty-action-buttons">
+                    {% if not today_attendance %}
+                        <form method="POST" action="{% url 'mark_attendance' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="quick_check_in">
+                            <input type="hidden" name="next" value="dashboard">
+                            <button type="submit" class="checkin-btn">
+                                <span>🟢</span> Quick Check-In
+                            </button>
+                        </form>
+                    {% elif not today_attendance.check_out_time %}
+                        <form method="POST" action="{% url 'mark_attendance' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="quick_check_out">
+                            <input type="hidden" name="next" value="dashboard">
+                            <button type="submit" class="checkout-btn">
+                                <span>🏁</span> End Shift (Check Out)
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    <a href="{% url 'attendance_list' %}" class="primary-btn">
+                        <span>⏱</span> Attendance Register →
+                    </a>
+                </div>
+            </div>
 
             <!-- =========================================
                  STAT CARDS
             ========================================== -->
 
             <div class="stat-grid">
+
 
 
                 <!-- TOTAL FAMILIES - CLICKABLE -->
@@ -574,10 +688,29 @@
 
                         </div>
 
+                <!-- MONTHLY ATTENDANCE / DUTY STAT - CLICKABLE -->
+                <a
+                    href="{% url 'attendance_list' %}"
+                    class="stat-card clickable-stat-card"
+                >
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.12); color: #059669;">
+                        ⏱
                     </div>
 
-                </div>
+                    <div>
+                        <span>
+                            Monthly Duty Days
+                        </span>
 
+                        <h2>
+                            {{ this_month_present_days }}
+                        </h2>
+
+                        <small class="stat-card-link">
+                            {{ this_month_visits }} visits • {{ this_month_patients }} patients →
+                        </small>
+                    </div>
+                </a>
 
             </div>
 
@@ -949,8 +1082,30 @@
 
             <div class="action-grid">
 
+                <!-- DAILY ATTENDANCE & DUTY -->
+                <a
+                    href="{% url 'attendance_list' %}"
+                    class="action-card"
+                >
+                    <div class="action-icon" style="background: rgba(16, 185, 129, 0.15); color: #059669;">
+                        ⏱
+                    </div>
+
+                    <h3>
+                        Daily Attendance & Duty
+                    </h3>
+
+                    <p>
+                        Track daily check-in, check-out, home visits, and monthly duty reports.
+                    </p>
+
+                    <span class="action-link">
+                        Manage Attendance →
+                    </span>
+                </a>
 
                 <!-- ADD FAMILY -->
+
 
                 <a
                     href="{% url 'add_family' %}"

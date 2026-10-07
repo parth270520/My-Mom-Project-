@@ -78,25 +78,6 @@ urlpatterns = [
         name='edit_member'
     ),
 
-    # NEW
-    path(
-        'ayushman-pending/',
-        views.ayushman_pending,
-        name='ayushman_pending'
-    ),
-
-    path(
-        'abha-pending/',
-        views.abha_pending,
-        name='abha_pending'
-    ),
-
-    path(
-        'logout/',
-        views.logout_view,
-        name='logout'
-    ),
-
     path(
         'ayushman-submitted/',
         views.ayushman_submitted,
@@ -122,4 +103,43 @@ urlpatterns = [
         views.age_range_members,
         name='age_range_members'
     ),
-]
+
+    # =====================================================
+    # ATTENDANCE ROUTES
+    # =====================================================
+    path(
+        'attendance/',
+        views.attendance_list,
+        name='attendance_list'
+    ),
+
+    path(
+        'attendance/mark/',
+        views.mark_attendance,
+        name='mark_attendance'
+    ),
+
+    path(
+        'attendance/<int:attendance_id>/edit/',
+        views.edit_attendance,
+        name='edit_attendance'
+    ),
+
+    path(
+        'attendance/<int:attendance_id>/delete/',
+        views.delete_attendance,
+        name='delete_attendance'
+    ),
+
+    path(
+        'attendance/report/',
+        views.attendance_report,
+        name='attendance_report'
+    ),
+
+    path(
+        'logout/',
+        views.logout_view,
+        name='logout'
+    ),
+]
